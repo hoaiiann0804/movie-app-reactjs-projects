@@ -6,14 +6,11 @@ import "./App.css";
 
 function App() {
     const [state, setState] = useState({
-        s: "sherlock",
+        s: "sherlock",    
         results: [],
         selected: {},
     });
-
-    const apiurl =
-        "https://www.omdbapi.com/?i=tt3896198&apikey=b3003689";
-
+    
     const searchInput = (e) => {
         let s = e.target.value;
 
@@ -24,9 +21,10 @@ function App() {
 
     const search = (e) => {
         if (e.key === "Enter") {
-            axios(apiurl + "&s=" + state.s).then(
+            const searchUrl =`https://api.themoviedb.org/3/search/movie?api_key=e3d460cad173ccfed6ffc7cad4197f72&language=vi-VN&query=${state.s}&page=1&include_adult=false`
+            axios(searchUrl ).then(
                 ({ data }) => {
-                    let results = data.Search;
+                    let results = data.results;
 
                     console.log(results);
 
@@ -42,12 +40,8 @@ function App() {
     };
 
     const openDetail = (id) => {
-        axios(apiurl + "&i=" + id).then(({ data }) => {
-            let result = data;
-
-            setState((prevState) => {
-                return { ...prevState, selected: result };
-            });
+        axios(`https://api.themoviedb.org/3/movie/${id}?api_key=e3d460cad173ccfed6ffc7cad4197f72&language=vi-VN`).then(({ data }) => {
+            setState(prevState => ({ ...prevState, selected: data }));
         });
     };
 
@@ -60,7 +54,7 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-                <h1>Movie Mania</h1>
+                <h1>TẤT CẢ DANH SÁCH PHIM</h1>
             </header>
             <main>
                 <Search
@@ -69,19 +63,19 @@ function App() {
                 />
 
                 <div className="container">
-                    {state.results.map((e) => (
+                    { Array.isArray(state.results) && state.results.map((e) => (
                         <div
                             className="item"
                             onClick={() =>
-                                openDetail(e.imdbID)
+                                openDetail(e.id)
                             }
                         >
                             <img
                                 style={{ width: "200px" }}
-                                src={e.Poster}
+                                src={"https://image.tmdb.org/t/p/w200" + e.poster_path}
                             />
                             <h3 style={{ color: "white" }}>
-                                {e.Title}
+                                {e.title}
                             </h3>
                         </div>
                     ))}
